@@ -23,6 +23,8 @@ class MonetPhotoDataset(data.Dataset):
         Number of Monet paintings
     dataset_len: int
         Length of dataset
+    train: bool
+        Train or test flag
     ...
     Methods
     -------
@@ -43,14 +45,14 @@ class MonetPhotoDataset(data.Dataset):
                 len(self.photo_files), int(len(self.photo_files) * (1 - test_size)), replace=False
             )] = 1
             monet_mask[np.random.choice(
-                len(self.monet_files), int(len(self.monet_files) * (1 - test_size)), replace=False
+                len(self.monet_files), int(len(self.monet_files) * 1), replace=False  # We take all Monet paintings to train
             )] = 1
         else:
             photo_mask[np.random.choice(
                 len(self.photo_files), int(len(self.photo_files) * test_size), replace=False
             )] = 1
             monet_mask[np.random.choice(
-                len(self.monet_files), int(len(self.monet_files) * test_size), replace=False
+                len(self.monet_files), int(len(self.monet_files) * 0), replace=False  # We take all Monet paintings to train
             )] = 1
         photo_mask = photo_mask.astype(bool)
         monet_mask = monet_mask.astype(bool)
@@ -62,11 +64,16 @@ class MonetPhotoDataset(data.Dataset):
         self.monet_len = len(self.monet_files)
         self.dataset_len = max(self.photo_len, self.monet_len)
 
+        self.train = train
+
     def __len__(self):
         return self.dataset_len
 
     def __getitem__(self, index):
-        monet_img = np.array(self.get_image(self.monet_files[index % self.monet_len]))
+        try:
+            monet_img = np.array(self.get_image(self.monet_files[index % self.monet_len]))
+        except ZeroDivisionError:
+            monet_img = np.array(self.get_image(self.photo_files[index % self.photo_len]))
         photo_img = np.array(self.get_image(self.photo_files[index % self.photo_len]))
         if self.transforms:
             augmented = self.transforms(image=monet_img, image0=photo_img)
@@ -81,8 +88,8 @@ class MonetPhotoDataset(data.Dataset):
 
 
 if __name__ == "__main__":
-    ds_train = MonetPhotoDataset(config.PHOTO_DIR, config.MONET_DIR, transforms=config.transform)
-    ds_test = MonetPhotoDataset(config.PHOTO_DIR, config.MONET_DIR, train=False, transforms=config.transform)
+    ds_train = MonetPhotoDataset(config.PHOTO_DIR, config.MONET_DIR, transforms=config.TRANSFORMS)
+    ds_test = MonetPhotoDataset(config.PHOTO_DIR, config.MONET_DIR, train=False, transforms=config.TRANSFORMS)
     train_monet, train_photo = ds_train[0]
     test_monet, test_photo = ds_test[0]
     print(f"Train dataset len: {len(ds_train)} | Monet shape: {train_monet.shape} | Photo shape: {train_photo.shape}")
