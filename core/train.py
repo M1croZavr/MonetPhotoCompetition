@@ -52,12 +52,12 @@ def train(disc_photo, disc_monet, gen_photo, gen_monet, loader, opt_disc, opt_ge
         cycle_loss_photo = l1(gen_photo(fake_monet), photo_batch)
         cycle_loss_monet = l1(gen_monet(fake_photo), monet_batch)
         # Identity loss, X (G)-> X, Y (F)-> Y
-        identity_loss_photo = l1(gen_photo(photo_batch), photo_batch)
-        identity_loss_monet = l1(gen_monet(monet_batch), monet_batch)
+        # identity_loss_photo = l1(gen_photo(photo_batch), photo_batch)
+        # identity_loss_monet = l1(gen_monet(monet_batch), monet_batch)
         # Overall generator loss
         g_loss = gen_loss_photo + gen_loss_monet + \
-            LAMBDA_CYCLE * cycle_loss_photo + LAMBDA_CYCLE * cycle_loss_monet + \
-            LAMBDA_IDENTITY * identity_loss_photo + LAMBDA_IDENTITY * identity_loss_monet
+            LAMBDA_CYCLE * cycle_loss_photo + LAMBDA_CYCLE * cycle_loss_monet  # + \
+            # LAMBDA_IDENTITY * identity_loss_photo + LAMBDA_IDENTITY * identity_loss_monet
         opt_gen.zero_grad()
         g_loss.backward()
         opt_gen.step()
@@ -80,6 +80,7 @@ def main():
                                    betas=(0.5, 0.999))
 
     l1 = nn.L1Loss()  # For cycle consistency and identity loss function
+    # l1 = nn.MSELoss()  # In case when mps is used as training device
     mse = nn.MSELoss()  # For adversarial loss, maybe try log loss later
 
     train_dataset = MonetPhotoDataset(photo_path=PHOTO_DIR,

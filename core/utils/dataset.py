@@ -45,14 +45,14 @@ class MonetPhotoDataset(data.Dataset):
                 len(self.photo_files), int(len(self.photo_files) * (1 - test_size)), replace=False
             )] = 1
             monet_mask[np.random.choice(
-                len(self.monet_files), int(len(self.monet_files) * 1), replace=False  # We take all Monet paintings to train
+                len(self.monet_files), int(len(self.monet_files) * (1 - test_size)), replace=False  # We take all Monet paintings to train
             )] = 1
         else:
             photo_mask[np.random.choice(
                 len(self.photo_files), int(len(self.photo_files) * test_size), replace=False
             )] = 1
             monet_mask[np.random.choice(
-                len(self.monet_files), int(len(self.monet_files) * 0), replace=False  # We take all Monet paintings to train
+                len(self.monet_files), int(len(self.monet_files) * test_size), replace=False  # We take all Monet paintings to train
             )] = 1
         photo_mask = photo_mask.astype(bool)
         monet_mask = monet_mask.astype(bool)

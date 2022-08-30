@@ -11,7 +11,7 @@ PHOTO_DIR = pathlib.Path("../data/gan-getting-started/photo_jpg")
 MONET_DIR = pathlib.Path("../data/gan-getting-started/monet_jpg")
 # print("Listdir:", os.listdir(PHOTO_DIR))
 BATCH_SIZE = 1
-LEARNING_RATE = 2e-4
+LEARNING_RATE = 5e-4
 LAMBDA_IDENTITY = 0.0
 LAMBDA_CYCLE = 10
 NUM_EPOCHS = 200

@@ -109,10 +109,12 @@ class Generator(nn.Module):
                 out_channels=hidden_n_channels,
                 kernel_size=7,
                 stride=1,
-                padding=0
+                padding=0,
+                bias=False,
             ),
             # shape: bc * hc * 256 * 256
             nn.InstanceNorm2d(hidden_n_channels),
+            nn.Dropout(),
             self.relu,
 
             nn.Conv2d(
@@ -120,10 +122,12 @@ class Generator(nn.Module):
                 out_channels=2 * hidden_n_channels,
                 kernel_size=3,
                 stride=2,
-                padding=1
+                padding=1,
+                bias=False,
             ),
             # shape: bc * 2hc * 128 * 128
             nn.InstanceNorm2d(2 * hidden_n_channels),
+            nn.Dropout(),
             self.relu,
 
             nn.Conv2d(
@@ -131,10 +135,12 @@ class Generator(nn.Module):
                 out_channels=4 * hidden_n_channels,
                 kernel_size=3,
                 stride=2,
-                padding=1
+                padding=1,
+                bias=False,
             ),
             # shape: bc * 4hc * 64 * 64
             nn.InstanceNorm2d(4 * hidden_n_channels),
+            nn.Dropout(),
             self.relu,
         ]
 
@@ -148,7 +154,8 @@ class Generator(nn.Module):
                 out_channels=4 * 2 * hidden_n_channels,
                 kernel_size=3,
                 stride=1,
-                padding=1),
+                padding=1,
+                bias=False),
             # shape: bc * 8hc * 64 * 64
             self.pixel_shuffle,
             # shape: bc * 2hc * 128 * 128
@@ -160,7 +167,8 @@ class Generator(nn.Module):
                 out_channels=2 * 2 * hidden_n_channels,
                 kernel_size=3,
                 stride=1,
-                padding=1),
+                padding=1,
+                bias=False),
             # shape: bc * 4hc * 128 * 128
             self.pixel_shuffle,
             # shape: bc * hc * 256 * 256
