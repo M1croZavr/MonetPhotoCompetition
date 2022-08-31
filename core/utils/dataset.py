@@ -25,6 +25,8 @@ class MonetPhotoDataset(data.Dataset):
         Length of dataset
     train: bool
         Train or test flag
+    small: bool
+        300 photos and 300 Monet paintings small dataset for experiments flag
     ...
     Methods
     -------
@@ -32,7 +34,7 @@ class MonetPhotoDataset(data.Dataset):
         Returns PIL.Image from filename
     """
 
-    def __init__(self, photo_path, monet_path, train=True, test_size=0.2, transforms=None):
+    def __init__(self, photo_path, monet_path, train=True, test_size=0.2, transforms=None, small=False):
         np.random.seed(123)
 
         self.photo_files = np.array(list(photo_path.glob("*.jpg")))
@@ -40,24 +42,30 @@ class MonetPhotoDataset(data.Dataset):
 
         photo_mask = np.zeros((len(self.photo_files), ))
         monet_mask = np.zeros((len(self.monet_files), ))
-        if train:
+        if small:
+            photo_mask[np.random.choice(
+                len(self.photo_files), 300, replace=False
+            )] = 1
+            monet_mask[np.random.choice(
+                len(self.monet_files), 300, replace=False
+            )] = 1
+        else:
             photo_mask[np.random.choice(
                 len(self.photo_files), int(len(self.photo_files) * (1 - test_size)), replace=False
             )] = 1
             monet_mask[np.random.choice(
-                len(self.monet_files), int(len(self.monet_files) * (1 - test_size)), replace=False  # We take all Monet paintings to train
-            )] = 1
-        else:
-            photo_mask[np.random.choice(
-                len(self.photo_files), int(len(self.photo_files) * test_size), replace=False
-            )] = 1
-            monet_mask[np.random.choice(
-                len(self.monet_files), int(len(self.monet_files) * test_size), replace=False  # We take all Monet paintings to train
+                len(self.monet_files), int(len(self.monet_files) * (1 - test_size)), replace=False
             )] = 1
         photo_mask = photo_mask.astype(bool)
         monet_mask = monet_mask.astype(bool)
-        self.photo_files = self.photo_files[photo_mask]
-        self.monet_files = self.monet_files[monet_mask]
+        if train or small:
+            self.photo_files = self.photo_files[photo_mask]
+            self.monet_files = self.monet_files[monet_mask]
+        elif not train and not small:
+            self.photo_files = self.photo_files[~photo_mask]
+            self.monet_files = self.monet_files[~monet_mask]
+        else:
+            raise AttributeError("Wrong combination of parameters 'train' and 'small'")
         self.transforms = transforms
 
         self.photo_len = len(self.photo_files)
@@ -65,6 +73,7 @@ class MonetPhotoDataset(data.Dataset):
         self.dataset_len = max(self.photo_len, self.monet_len)
 
         self.train = train
+        self.small = small
 
     def __len__(self):
         return self.dataset_len
