@@ -1,5 +1,5 @@
 import torch
-from core.models import Discriminator, Generator
+from ..models import Discriminator, Generator
 import os
 
 
