@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/MonetCompetition.iml" filepath="$PROJECT_DIR$/.idea/MonetCompetition.iml" />
+      <module fileurl="file://$USER_HOME$/PycharmProjects/simple-GAN/.idea/simple-GAN.iml" filepath="$USER_HOME$/PycharmProjects/simple-GAN/.idea/simple-GAN.iml" />
     </modules>
   </component>
 </project>

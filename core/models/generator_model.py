@@ -26,7 +26,7 @@ class ResidualBlock(nn.Module):
     def __init__(self, n_channels: int):
         super(ResidualBlock, self).__init__()
         self.instance_norm = nn.InstanceNorm2d(n_channels)
-        self.relu = nn.ReLU()
+        self.relu = nn.ReLU(inplace=True)
         self.conv_block = nn.Sequential(*[
             nn.Conv2d(
                 in_channels=n_channels,
@@ -36,7 +36,7 @@ class ResidualBlock(nn.Module):
                 padding=1
             ),
             nn.InstanceNorm2d(n_channels),
-            nn.ReLU(),
+            self.relu,
             nn.Conv2d(
                 in_channels=n_channels,
                 out_channels=n_channels,
@@ -106,15 +106,15 @@ class Generator(nn.Module):
             # shape: bc * 3 * 262 * 262
             nn.Conv2d(
                 in_channels=in_n_channels,
-                out_channels=hidden_n_channels,
+                out_channels=hidden_n_channels,  # for example 64
                 kernel_size=7,
                 stride=1,
                 padding=0,
-                bias=False,
+                # bias=False,
             ),
             # shape: bc * hc * 256 * 256
             nn.InstanceNorm2d(hidden_n_channels),
-            nn.Dropout(),
+            # nn.Dropout(),
             self.relu,
 
             nn.Conv2d(
@@ -123,11 +123,11 @@ class Generator(nn.Module):
                 kernel_size=3,
                 stride=2,
                 padding=1,
-                bias=False,
+                # bias=False,
             ),
             # shape: bc * 2hc * 128 * 128
             nn.InstanceNorm2d(2 * hidden_n_channels),
-            nn.Dropout(),
+            # nn.Dropout(),
             self.relu,
 
             nn.Conv2d(
@@ -136,11 +136,11 @@ class Generator(nn.Module):
                 kernel_size=3,
                 stride=2,
                 padding=1,
-                bias=False,
+                # bias=False,
             ),
             # shape: bc * 4hc * 64 * 64
             nn.InstanceNorm2d(4 * hidden_n_channels),
-            nn.Dropout(),
+            # nn.Dropout(),
             self.relu,
         ]
 
@@ -155,7 +155,8 @@ class Generator(nn.Module):
                 kernel_size=3,
                 stride=1,
                 padding=1,
-                bias=False),
+                # bias=False
+            ),
             # shape: bc * 8hc * 64 * 64
             self.pixel_shuffle,
             # shape: bc * 2hc * 128 * 128
@@ -168,7 +169,8 @@ class Generator(nn.Module):
                 kernel_size=3,
                 stride=1,
                 padding=1,
-                bias=False),
+                # bias=False
+            ),
             # shape: bc * 4hc * 128 * 128
             self.pixel_shuffle,
             # shape: bc * hc * 256 * 256

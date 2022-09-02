@@ -38,7 +38,8 @@ class Discriminator(nn.Module):
                       kernel_size=4,
                       stride=2,
                       padding=1,
-                      bias=False),
+                      # bias=False
+                      ),
             # shape: bc * hc * 128 * 128
             nn.LeakyReLU(0.2),
 
@@ -47,7 +48,8 @@ class Discriminator(nn.Module):
                       kernel_size=4,
                       stride=2,
                       padding=1,
-                      bias=False),
+                      # bias=False
+                      ),
             # shape: bc * 2hc * 64 * 64
             nn.InstanceNorm2d(2 * hidden_n_channels),
             nn.LeakyReLU(0.2),
@@ -57,7 +59,8 @@ class Discriminator(nn.Module):
                       kernel_size=4,
                       stride=2,
                       padding=1,
-                      bias=False),
+                      # bias=False
+                      ),
             # shape: bc * 4hc * 32 * 32
             nn.InstanceNorm2d(4 * hidden_n_channels),
             nn.LeakyReLU(0.2),
@@ -67,7 +70,8 @@ class Discriminator(nn.Module):
                       kernel_size=4,
                       stride=1,
                       padding=1,
-                      bias=False),
+                      # bias=False
+                      ),
             # shape: bc * 8hc * 31 * 31
             nn.InstanceNorm2d(8 * hidden_n_channels),
             nn.LeakyReLU(0.2),
@@ -77,7 +81,8 @@ class Discriminator(nn.Module):
                       kernel_size=4,
                       stride=1,
                       padding=1,
-                      bias=True)
+                      # bias=True
+                      )
             # shape: bc * 1 * 30 * 30
 
         ])
