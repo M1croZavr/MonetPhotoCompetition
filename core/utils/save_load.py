@@ -41,22 +41,22 @@ def load_current_state(filename, device="cpu"):
     print("Loading states...")
     print(os.listdir(filename))
     d_monet.load_state_dict(
-        torch.load(os.path.join(filename, "criticmonet.pth.tar"), map_location=torch.device(device))["model_state_dict"]
+        torch.load(filename, map_location=torch.device(device))["model_state_dict"]
     )
     d_photo.load_state_dict(
-        torch.load(os.path.join(filename, "criticphoto.pth.tar"), map_location=torch.device(device))["model_state_dict"]
+        torch.load(filename, map_location=torch.device(device))["model_state_dict"]
     )
     g_monet.load_state_dict(
-        torch.load(os.path.join(filename, "genmonet.pth.tar"), map_location=torch.device(device))["model_state_dict"]
+        torch.load(filename, map_location=torch.device(device))["model_state_dict"]
     )
     g_photo.load_state_dict(
-        torch.load(os.path.join(filename, "genphoto.pth.tar"), map_location=torch.device(device))["model_state_dict"]
+        torch.load(filename, map_location=torch.device(device))["model_state_dict"]
     )
     d_optimizer = torch.optim.Optimizer.load_state_dict(
-        torch.load(os.path.join(filename, "criticmonet.pth.tar"), map_location=torch.device(device))["optimizer_state_dict"]
+        torch.load(filename, map_location=torch.device(device))["optimizer_state_dict"]
     )
     g_optimizer = torch.optim.Optimizer.load_state_dict(
-        torch.load(os.path.join(filename, "genmonet.pth.tar"), map_location=torch.device(device))["optimizer_state_dict"]
+        torch.load(filename, map_location=torch.device(device))["optimizer_state_dict"]
     )
     print("Loaded states")
     return d_monet, d_photo, g_monet, g_photo, d_optimizer, g_optimizer
