@@ -28,8 +28,6 @@ def load_current_state(d_monet_filename,
                        d_photo_filename,
                        g_monet_filename,
                        g_photo_filename,
-                       d_optimizer,
-                       g_optimizer,
                        device="cpu"):
     """
     Loads models and optimizers from state dicts
@@ -65,12 +63,10 @@ def load_current_state(d_monet_filename,
     )
     d_optimizer = torch.optim.Adam(list(d_monet.parameters()) + list(d_photo.parameters()))
     g_optimizer = torch.optim.Adam(list(g_monet.parameters()) + list(g_photo.parameters()))
-    d_optimizer = torch.optim.Optimizer.load_state_dict(
-        d_optimizer,
+    d_optimizer.load_state_dict(
         torch.load(d_monet_filename, map_location=torch.device(device))["optimizer_state_dict"]
     )
-    g_optimizer = torch.optim.Optimizer.load_state_dict(
-        g_optimizer,
+    g_optimizer.load_state_dict(
         torch.load(g_monet_filename, map_location=torch.device(device))["optimizer_state_dict"]
     )
     print("Loaded states")
