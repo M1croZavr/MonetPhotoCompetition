@@ -24,13 +24,23 @@ def save_current_state(model, optimizer, filename):
     print("Saved current state")
 
 
-def load_current_state(filename, device="cpu"):
+def load_current_state(d_monet_filename,
+                       d_photo_filename,
+                       g_monet_filename,
+                       g_photo_filename,
+                       device="cpu"):
     """
     Loads models and optimizers from state dicts
     Parameters
     ----------
-    filename: path-like object
-        Filepath of saving
+    d_monet_filename: path-like object
+        Filepath of monet paintings discriminator
+    d_photo_filename: path-like object
+        Filepath of photo discriminator
+    g_monet_filename: path-like object
+        Filepath of monet paintings generator
+    g_photo_filename: path-like object
+        Filepath of photo generator
     device:
         Torch device
     """
@@ -39,28 +49,27 @@ def load_current_state(filename, device="cpu"):
     g_monet = Generator(3, 64).to(device)
     g_photo = Generator(3, 64).to(device)
     print("Loading states...")
-    print(os.listdir(filename))
     d_monet.load_state_dict(
-        torch.load(filename, map_location=torch.device(device))["model_state_dict"]
+        torch.load(d_monet_filename, map_location=torch.device(device))["model_state_dict"]
     )
     d_photo.load_state_dict(
-        torch.load(filename, map_location=torch.device(device))["model_state_dict"]
+        torch.load(d_photo_filename, map_location=torch.device(device))["model_state_dict"]
     )
     g_monet.load_state_dict(
-        torch.load(filename, map_location=torch.device(device))["model_state_dict"]
+        torch.load(g_monet_filename, map_location=torch.device(device))["model_state_dict"]
     )
     g_photo.load_state_dict(
-        torch.load(filename, map_location=torch.device(device))["model_state_dict"]
+        torch.load(g_photo_filename, map_location=torch.device(device))["model_state_dict"]
     )
     d_optimizer = torch.optim.Optimizer.load_state_dict(
-        torch.load(filename, map_location=torch.device(device))["optimizer_state_dict"]
+        torch.load(d_monet_filename, map_location=torch.device(device))["optimizer_state_dict"]
     )
     g_optimizer = torch.optim.Optimizer.load_state_dict(
-        torch.load(filename, map_location=torch.device(device))["optimizer_state_dict"]
+        torch.load(g_monet_filename, map_location=torch.device(device))["optimizer_state_dict"]
     )
     print("Loaded states")
     return d_monet, d_photo, g_monet, g_photo, d_optimizer, g_optimizer
 
 
 if __name__ == "__main__":
-    load_current_state("../../states")
+    pass
