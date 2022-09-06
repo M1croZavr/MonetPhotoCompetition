@@ -161,6 +161,7 @@ class Generator(nn.Module):
             self.pixel_shuffle,
             # shape: bc * 2hc * 128 * 128
             nn.InstanceNorm2d(2 * hidden_n_channels),
+            nn.Dropout(),
             self.relu,
 
             nn.ConvTranspose2d(
@@ -175,6 +176,7 @@ class Generator(nn.Module):
             self.pixel_shuffle,
             # shape: bc * hc * 256 * 256
             nn.InstanceNorm2d(hidden_n_channels),
+            nn.Dropout(),
             self.relu,
 
             # shape: bc * hc * 262 * 262
