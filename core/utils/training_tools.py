@@ -3,7 +3,7 @@ import random
 
 
 class GeneratedImages:
-    def __int__(self, max_size=50):
+    def __init__(self, max_size=50):
         self.buffer = None
         self.max_size = max_size
 
