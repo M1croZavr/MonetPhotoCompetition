@@ -38,50 +38,45 @@ class Discriminator(nn.Module):
                       kernel_size=4,
                       stride=2,
                       padding=1,
-                      # bias=False
                       ),
             # shape: bc * hc * 128 * 128
-            nn.LeakyReLU(0.2),
+            nn.LeakyReLU(0.2, inplace=True),
 
             nn.Conv2d(in_channels=hidden_n_channels,
                       out_channels=2 * hidden_n_channels,
                       kernel_size=4,
                       stride=2,
                       padding=1,
-                      # bias=False
                       ),
             # shape: bc * 2hc * 64 * 64
             nn.InstanceNorm2d(2 * hidden_n_channels),
-            nn.LeakyReLU(0.2),
+            nn.LeakyReLU(0.2, inplace=True),
 
             nn.Conv2d(in_channels=2 * hidden_n_channels,
                       out_channels=4 * hidden_n_channels,
                       kernel_size=4,
                       stride=2,
                       padding=1,
-                      # bias=False
                       ),
             # shape: bc * 4hc * 32 * 32
             nn.InstanceNorm2d(4 * hidden_n_channels),
-            nn.LeakyReLU(0.2),
+            nn.LeakyReLU(0.2, inplace=True),
 
             nn.Conv2d(in_channels=4 * hidden_n_channels,
                       out_channels=8 * hidden_n_channels,
                       kernel_size=4,
                       stride=1,
                       padding=1,
-                      # bias=False
                       ),
             # shape: bc * 8hc * 31 * 31
             nn.InstanceNorm2d(8 * hidden_n_channels),
-            nn.LeakyReLU(0.2),
+            nn.LeakyReLU(0.2, inplace=True),
 
             nn.Conv2d(in_channels=8 * hidden_n_channels,
                       out_channels=1,
                       kernel_size=4,
                       stride=1,
                       padding=1,
-                      # bias=True
                       )
             # shape: bc * 1 * 30 * 30
 

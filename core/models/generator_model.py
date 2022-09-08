@@ -25,8 +25,8 @@ class ResidualBlock(nn.Module):
 
     def __init__(self, n_channels: int):
         super(ResidualBlock, self).__init__()
-        self.instance_norm = nn.InstanceNorm2d(n_channels)
-        self.relu = nn.ReLU(inplace=True)
+        # self.instance_norm = nn.InstanceNorm2d(n_channels)
+        # self.relu = nn.ReLU(inplace=True)
         self.conv_block = nn.Sequential(*[
             nn.Conv2d(
                 in_channels=n_channels,
@@ -36,7 +36,8 @@ class ResidualBlock(nn.Module):
                 padding=1
             ),
             nn.InstanceNorm2d(n_channels),
-            self.relu,
+            nn.Dropout(0.5, inplace=True),
+            nn.ReLU(inplace=True),
             nn.Conv2d(
                 in_channels=n_channels,
                 out_channels=n_channels,
@@ -44,12 +45,11 @@ class ResidualBlock(nn.Module):
                 stride=1,
                 padding=1
             ),
+            nn.InstanceNorm2d(n_channels),
         ])
 
     def forward(self, x: torch.Tensor):
         output = self.conv_block(x) + x
-        output = self.instance_norm(output)
-        output = self.relu(output)
         return output
 
 
@@ -86,7 +86,7 @@ class Generator(nn.Module):
                  n_residuals: int = 9):
         super(Generator, self).__init__()
         self.reflection_pad = nn.ReflectionPad2d(3)
-        self.pixel_shuffle = nn.PixelShuffle(2)
+        self.pixel_shuffle = nn.PixelShuffle(2)  # not used for now
         self.relu = nn.ReLU(inplace=True)
         self.gathered_layers = self.gather_layers(in_n_channels, hidden_n_channels, n_residuals)
         self.generator_block = nn.Sequential(*self.gathered_layers)
@@ -110,12 +110,10 @@ class Generator(nn.Module):
                 kernel_size=7,
                 stride=1,
                 padding=0,
-                # bias=False,
             ),
             # shape: bc * hc * 256 * 256
             nn.InstanceNorm2d(hidden_n_channels),
-            # nn.Dropout(),
-            self.relu,
+            nn.ReLU(inplace=True),
 
             nn.Conv2d(
                 in_channels=hidden_n_channels,
@@ -123,12 +121,10 @@ class Generator(nn.Module):
                 kernel_size=3,
                 stride=2,
                 padding=1,
-                # bias=False,
             ),
             # shape: bc * 2hc * 128 * 128
             nn.InstanceNorm2d(2 * hidden_n_channels),
-            # nn.Dropout(),
-            self.relu,
+            nn.ReLU(inplace=True),
 
             nn.Conv2d(
                 in_channels=2 * hidden_n_channels,
@@ -136,12 +132,10 @@ class Generator(nn.Module):
                 kernel_size=3,
                 stride=2,
                 padding=1,
-                # bias=False,
             ),
             # shape: bc * 4hc * 64 * 64
             nn.InstanceNorm2d(4 * hidden_n_channels),
-            # nn.Dropout(),
-            self.relu,
+            nn.ReLU(inplace=True),
         ]
 
         for _ in range(n_residuals):
@@ -151,33 +145,31 @@ class Generator(nn.Module):
         layers += [
             nn.ConvTranspose2d(
                 in_channels=4 * hidden_n_channels,
-                out_channels=4 * 2 * hidden_n_channels,
+                out_channels=2 * hidden_n_channels,
                 kernel_size=3,
-                stride=1,
+                stride=2,
                 padding=1,
-                # bias=False
+                output_padding=1,
             ),
-            # shape: bc * 8hc * 64 * 64
-            self.pixel_shuffle,
+            # # shape: bc * 8hc * 64 * 64
+            # self.pixel_shuffle,
             # shape: bc * 2hc * 128 * 128
             nn.InstanceNorm2d(2 * hidden_n_channels),
-            nn.Dropout(),
-            self.relu,
+            nn.ReLU(inplace=True),
 
             nn.ConvTranspose2d(
                 in_channels=2 * hidden_n_channels,
-                out_channels=2 * 2 * hidden_n_channels,
+                out_channels=hidden_n_channels,
                 kernel_size=3,
-                stride=1,
+                stride=2,
                 padding=1,
-                # bias=False
+                output_padding=1,
             ),
-            # shape: bc * 4hc * 128 * 128
-            self.pixel_shuffle,
+            # # shape: bc * 4hc * 128 * 128
+            # self.pixel_shuffle,
             # shape: bc * hc * 256 * 256
             nn.InstanceNorm2d(hidden_n_channels),
-            nn.Dropout(),
-            self.relu,
+            nn.ReLU(inplace=True),
 
             # shape: bc * hc * 262 * 262
             nn.Conv2d(
