@@ -26,7 +26,7 @@ class ResidualBlock(nn.Module):
     def __init__(self, n_channels: int):
         super(ResidualBlock, self).__init__()
         # self.instance_norm = nn.InstanceNorm2d(n_channels)
-        # self.relu = nn.ReLU(inplace=True)
+        self.relu = nn.ReLU(inplace=True)
         self.conv_block = nn.Sequential(*[
             nn.Conv2d(
                 in_channels=n_channels,
@@ -50,6 +50,7 @@ class ResidualBlock(nn.Module):
 
     def forward(self, x: torch.Tensor):
         output = self.conv_block(x) + x
+        output = self.relu(output)
         return output
 
 
