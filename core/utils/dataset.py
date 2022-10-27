@@ -95,6 +95,83 @@ class MonetPhotoDataset(data.Dataset):
         image = Image.open(filename)
         return image
 
+    class NormalMalignantDataset(data.Dataset):
+        """
+        Pytorch style dataset class. Created for processing images of normal CT and malignant CT.
+        ...
+        Attributes
+        ----------
+        normal_files: np.ndarray
+            Array of normal examples filenames (train or test)
+        malignant_files: np.ndarray
+            Array of malignant examples filenames (train or test)
+        transforms: albumentations.Compose
+            Transforms to apply on images data
+        normal_len: int
+            Number of normal examples
+        malignant_len: int
+            Number of malignant examples
+        dataset_len: int
+            Length of dataset
+        train: bool
+            Train or test flag
+        ...
+        Methods
+        -------
+        get_image: static
+            Returns PIL.Image from filename
+        """
+
+        def __init__(self, normal_path, malignant_path, train=True, test_size=0.2, transforms=None):
+            np.random.seed(123)
+
+            self.normal_files = np.array(list(normal_path.glob("*.jpg")))
+            self.malignant_files = np.array(list(malignant_path.glob("*.jpg")))
+
+            normal_mask = np.zeros((len(self.normal_files), ))
+            malignant_mask = np.zeros((len(self.malignant_files), ))
+            normal_mask[np.random.choice(
+                len(self.normal_files), int(len(self.normal_files) * (1 - test_size)), replace=False
+            )] = 1
+            malignant_mask[np.random.choice(
+                len(self.malignant_files), int(len(self.malignant_files) * (1 - test_size)), replace=False
+            )] = 1
+            normal_mask = normal_mask.astype(bool)
+            malignant_mask = malignant_mask.astype(bool)
+            if train:
+                self.normal_files = self.normal_files[normal_mask]
+                self.malignant_files = self.malignant_files[malignant_mask]
+            else:
+                self.normal_files = self.normal_files[~normal_mask]
+                self.malignant_files = self.malignant_files[~malignant_mask]
+            self.transforms = transforms
+
+            self.normal_len = len(self.normal_files)
+            self.malignant_len = len(self.malignant_files)
+            self.dataset_len = max(self.normal_len, self.malignant_len)
+
+            self.train = train
+
+        def __len__(self):
+            return self.dataset_len
+
+        def __getitem__(self, index):
+            try:
+                malignant_img = self.get_image(self.malignant_files[index % self.malignant_len])
+            # except ZeroDivisionError:
+            #     monet_img = self.get_image(self.photo_files[index % self.photo_len])
+            normal_img = self.get_image(self.normal_files[index % self.normal_len])
+            if self.transforms:
+                augmented = self.transforms(image=malignant_img, image0=normal_img)
+                malignant_img = augmented["image"]
+                normal_img = augmented["image0"]
+            return malignant_img, normal_img
+
+        @staticmethod
+        def get_image(filename):
+            image = Image.open(filename)
+            return image
+
 
 if __name__ == "__main__":
     ds_train = MonetPhotoDataset(config.PHOTO_DIR, config.MONET_DIR, transforms=config.TRANSFORMS)
