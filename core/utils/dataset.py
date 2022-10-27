@@ -156,10 +156,10 @@ class NormalMalignantDataset(data.Dataset):
         return self.dataset_len
 
     def __getitem__(self, index):
-        malignant_img = self.get_image(self.malignant_files[index % self.malignant_len])
+        malignant_img = np.asarray(self.get_image(self.malignant_files[index % self.malignant_len]))
         # except ZeroDivisionError:
         #     monet_img = self.get_image(self.photo_files[index % self.photo_len])
-        normal_img = self.get_image(self.normal_files[index % self.normal_len])
+        normal_img = np.asarray(self.get_image(self.normal_files[index % self.normal_len]))
         if self.transforms:
             augmented = self.transforms(image=malignant_img, image0=normal_img)
             malignant_img = augmented["image"]
